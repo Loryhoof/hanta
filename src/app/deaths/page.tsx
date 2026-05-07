@@ -9,7 +9,7 @@ export const metadata = pageMetadata({
 });
 
 export default function Page() {
-  const deaths = trendData.reduce((sum, point) => sum + point.deaths, 0);
+  const deaths = trendData.reduce((sum, point) => sum + (point.deaths ?? 0), 0);
 
   return (
     <>

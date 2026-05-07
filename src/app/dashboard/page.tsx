@@ -1,4 +1,5 @@
 import { PageHero } from "@/components/page-shell";
+import { SourceLink } from "@/components/source-link";
 import { TrendChart } from "@/components/trend-chart";
 import { trendData } from "@/lib/content";
 import { getMortalityRate, getSourceFreshness } from "@/lib/risk";
@@ -14,12 +15,16 @@ export default function Page() {
   const totals = trendData.reduce(
     (acc, point) => ({
       infections: acc.infections + point.infections,
-      deaths: acc.deaths + point.deaths,
-      countries: Math.max(acc.countries, point.countries),
+      deaths: acc.deaths + (point.deaths ?? 0),
+      countries: Math.max(acc.countries, point.countries ?? 0),
     }),
     { infections: 0, deaths: 0, countries: 0 },
   );
-  const freshness = getSourceFreshness("2024-12-01", new Date("2026-05-07T00:00:00Z"));
+  const latestSourceDate = trendData
+    .map((point) => point.sourceUpdatedAt)
+    .sort()
+    .at(-1);
+  const freshness = getSourceFreshness(latestSourceDate ?? "Unknown date", new Date("2026-05-07T00:00:00Z"));
 
   return (
     <>
@@ -32,9 +37,9 @@ export default function Page() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-4 md:grid-cols-4">
             <Stat label="Infections in chart" value={totals.infections.toLocaleString()} />
-            <Stat label="Deaths in chart" value={totals.deaths.toLocaleString()} />
-            <Stat label="Max countries" value={totals.countries.toLocaleString()} />
-            <Stat label="Chart mortality" value={`${getMortalityRate(totals.deaths, totals.infections)}%`} />
+            <Stat label="Known deaths in chart" value={totals.deaths.toLocaleString()} />
+            <Stat label="Max reporting countries" value={totals.countries.toLocaleString()} />
+            <Stat label="Known-case mortality" value={`${getMortalityRate(totals.deaths, totals.infections)}%`} />
           </div>
           <div className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6">
             <TrendChart data={trendData} />
@@ -42,9 +47,32 @@ export default function Page() {
           <div className="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-amber-950">
             <p className="font-semibold">Source freshness: {freshness.label}</p>
             <p className="mt-2 text-sm leading-6">
-              Official surveillance data can lag behind recent headlines. Always check the
-              source date before interpreting a trend.
+              This temporary chart uses recent U.S. provisional YTD surveillance and a 2026
+              WHO/UN outbreak update. Always check the source and geography before interpreting
+              a trend.
             </p>
+          </div>
+          <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6">
+            <h2 className="text-2xl font-black text-slate-950">Chart sources</h2>
+            <div className="mt-4 grid gap-4">
+              {[...trendData].reverse().map((point) => (
+                <div key={point.year} className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-sm font-black text-slate-950">
+                    {point.year} · {point.geography}
+                  </p>
+                  {point.note ? (
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{point.note}</p>
+                  ) : null}
+                  <div className="mt-3">
+                    <SourceLink
+                      name={point.sourceName}
+                      url={point.sourceUrl}
+                      date={point.sourceUpdatedAt}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

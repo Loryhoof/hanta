@@ -48,7 +48,7 @@ export function TrendChart({ data }: { data: MetricPoint[] }) {
           data: data.map((point) => point.deaths),
         },
         {
-          name: "Countries",
+          name: "Reporting countries",
           type: "line",
           smooth: true,
           data: data.map((point) => point.countries),

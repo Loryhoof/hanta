@@ -5,8 +5,13 @@ export type RiskLevel = "low" | "watch" | "elevated" | "active";
 export type MetricPoint = {
   year: number;
   infections: number;
-  deaths: number;
-  countries: number;
+  deaths: number | null;
+  countries: number | null;
+  geography: string;
+  sourceName: string;
+  sourceUrl: string;
+  sourceUpdatedAt: string;
+  note?: string;
 };
 
 export type OutbreakRegion = {
@@ -38,6 +43,7 @@ export const globalStatus = {
   label: "Current global status",
   level: "watch" as RiskLevel,
   updatedAt: "2026-05-07",
+  detailsPath: "/outbreaks/multi-country-cruise-cluster",
   latestVerifiedUpdate:
     "WHO is tracking a multi-country hantavirus cluster linked to cruise ship travel. WHO currently assesses the risk to the global population from this event as low.",
   sourceName: "WHO Disease Outbreak News",
@@ -181,12 +187,39 @@ export const outbreaks: OutbreakRegion[] = [
 ];
 
 export const trendData: MetricPoint[] = [
-  { year: 2018, infections: 2100, deaths: 56, countries: 24 },
-  { year: 2019, infections: 2450, deaths: 61, countries: 25 },
-  { year: 2020, infections: 3850, deaths: 74, countries: 26 },
-  { year: 2021, infections: 4860, deaths: 82, countries: 29 },
-  { year: 2022, infections: 3200, deaths: 66, countries: 27 },
-  { year: 2023, infections: 4100, deaths: 71, countries: 28 },
+  {
+    year: 2024,
+    infections: 20,
+    deaths: null,
+    countries: null,
+    geography: "United States, year-to-date through week 35",
+    sourceName: "CDC NNDSS weekly table",
+    sourceUrl: "https://stacks.cdc.gov/view/cdc/232004/cdc_232004_DS1.pdf",
+    sourceUpdatedAt: "2025-08-30",
+    note: "CDC provisional YTD count for reporting year 2024 as shown in week 35, 2025 table.",
+  },
+  {
+    year: 2025,
+    infections: 35,
+    deaths: null,
+    countries: null,
+    geography: "United States, year-to-date through week 35",
+    sourceName: "CDC NNDSS weekly table",
+    sourceUrl: "https://stacks.cdc.gov/view/cdc/232004/cdc_232004_DS1.pdf",
+    sourceUpdatedAt: "2025-08-30",
+    note: "CDC provisional YTD count for reporting year 2025 as shown in week 35, 2025 table.",
+  },
+  {
+    year: 2026,
+    infections: 8,
+    deaths: 3,
+    countries: null,
+    geography: "Multi-country cruise-linked cluster",
+    sourceName: "UN Geneva / WHO update",
+    sourceUrl: "https://www.ungeneva.org/en/news-media/news/2026/05/118368/hantavirus-outbreak-another-passenger-contracts-disease",
+    sourceUpdatedAt: "2026-05-06",
+    note: "WHO/UN reported eight infections linked to the cruise outbreak, including three Andes hantavirus confirmations.",
+  },
 ];
 
 export const researchPapers = [

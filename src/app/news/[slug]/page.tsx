@@ -58,14 +58,26 @@ export default async function Page({ params }: Props) {
           <div className="rounded-3xl border border-slate-200 bg-white p-8">
             <p className="text-lg leading-8 text-slate-700">{article.summary}</p>
 
-            <h2 className="mt-8 text-3xl font-black text-slate-950">Key points</h2>
-            <ul className="mt-4 grid gap-3">
-              {article.keyPoints.map((point) => (
-                <li key={point} className="rounded-2xl bg-slate-50 p-4 leading-7 text-slate-700">
-                  {point}
-                </li>
-              ))}
-            </ul>
+            {article.contentStatus === "full" && article.keyPoints.length > 0 ? (
+              <>
+                <h2 className="mt-8 text-3xl font-black text-slate-950">Key points</h2>
+                <ul className="mt-4 grid gap-3">
+                  {article.keyPoints.map((point) => (
+                    <li key={point} className="rounded-2xl bg-slate-50 p-4 leading-7 text-slate-700">
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <div className="mt-8 rounded-2xl bg-amber-50 p-5 text-amber-950">
+                <h2 className="text-xl font-black">Source text unavailable</h2>
+                <p className="mt-2 leading-7">
+                  This feed item only provides a headline, publisher, date, and link. It is not
+                  being summarized because the article body was not available from the source feed.
+                </p>
+              </div>
+            )}
 
             <h2 className="mt-8 text-3xl font-black text-slate-950">Why it matters</h2>
             <p className="mt-4 leading-7 text-slate-700">{article.whyItMatters}</p>
@@ -83,11 +95,12 @@ export default async function Page({ params }: Props) {
           <aside className="h-fit rounded-3xl border border-slate-200 bg-white p-6">
             <h2 className="text-2xl font-black text-slate-950">Original source</h2>
             <p className="mt-3 text-sm leading-6 text-slate-600">
-              This page summarizes a source update. Use the original agency page for the
-              complete notice and any later corrections.
+              {article.contentStatus === "full"
+                ? "This page summarizes a source update. Use the original agency page for the complete notice and any later corrections."
+                : "This page lists a feed item without article body text. Use the linked source listing or publisher page for the report itself."}
             </p>
             <div className="mt-6">
-            <SourceLink name={article.sourceName} url={article.sourceUrl} date={article.publishedAt} />
+              <SourceLink name={article.sourceName} url={article.sourceUrl} date={article.publishedAt} />
             </div>
           </aside>
         </article>

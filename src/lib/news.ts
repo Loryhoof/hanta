@@ -8,6 +8,7 @@ export type NewsArticle = {
   publishedAt: string;
   sourceName: string;
   sourceUrl: string;
+  contentStatus: "full" | "listing";
   summary: string;
   keyPoints: string[];
   whyItMatters: string;
@@ -40,6 +41,7 @@ const sourceUnavailableFallback: NewsArticle[] = [
     publishedAt: new Date().toISOString().slice(0, 10),
     sourceName: "WHO Disease Outbreak News",
     sourceUrl: "https://www.who.int/emergencies/disease-outbreak-news",
+    contentStatus: "listing",
     summary:
       "Live news sources could not be reached. Check WHO Disease Outbreak News or national public health agencies directly for the latest updates.",
     keyPoints: [
@@ -107,6 +109,29 @@ function splitGoogleNewsTitle(title = "Hantavirus news update") {
   };
 }
 
+function normalizedComparableText(input = "") {
+  return input
+    .toLowerCase()
+    .replace(/&nbsp;/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isLowInformationSnippet(snippet: string, headline: string, sourceName: string) {
+  const normalizedSnippet = normalizedComparableText(snippet);
+  if (!normalizedSnippet) return true;
+
+  const headlineWithSource = normalizedComparableText(`${headline} ${sourceName}`);
+  const titleWithSource = normalizedComparableText(`${headline} - ${sourceName}`);
+
+  return (
+    normalizedSnippet === headlineWithSource ||
+    normalizedSnippet === titleWithSource ||
+    normalizedSnippet.length < 80
+  );
+}
+
 function publishedTime(article: NewsArticle) {
   const time = new Date(`${article.publishedAt}T00:00:00Z`).getTime();
   return Number.isNaN(time) ? 0 : time;
@@ -140,6 +165,7 @@ function articleFromWhoItem(item: WhoDonItem): NewsArticle {
     publishedAt: item.PublicationDateAndTime?.slice(0, 10) ?? "Unknown date",
     sourceName: "WHO",
     sourceUrl: whoItemUrl(item),
+    contentStatus: "full",
     summary:
       firstSentences(summaryText || overviewText, 2).join(" ") ||
       "WHO published a Disease Outbreak News update relevant to hantavirus monitoring.",
@@ -157,9 +183,11 @@ async function getGoogleNewsArticles(): Promise<NewsArticle[]> {
   return feed.items.slice(0, 12).map((item) => {
     const { headline, sourceName } = splitGoogleNewsTitle(item.title);
     const publishedAt = item.isoDate?.slice(0, 10) ?? new Date().toISOString().slice(0, 10);
-    const summary =
-      item.contentSnippet?.replace(/\s+/g, " ").trim() ||
-      `Recent reporting from ${sourceName} about hantavirus.`;
+    const snippet = item.contentSnippet?.replace(/\s+/g, " ").trim() ?? "";
+    const hasUsableSnippet = !isLowInformationSnippet(snippet, headline, sourceName);
+    const summary = hasUsableSnippet
+      ? snippet
+      : `A ${sourceName} report about hantavirus was listed by Google News. Open the source listing to read the original report and verify details.`;
     const slug = `news-${publishedAt}-${slugify(headline)}`;
 
     return {
@@ -169,15 +197,19 @@ async function getGoogleNewsArticles(): Promise<NewsArticle[]> {
       publishedAt,
       sourceName,
       sourceUrl: item.link ?? googleNewsEndpoint,
+      contentStatus: hasUsableSnippet ? "full" : "listing",
       summary,
-      keyPoints: [
-        summary,
-        "This is a media report, so details should be checked against official public-health updates when available.",
-      ],
+      keyPoints: hasUsableSnippet
+        ? [
+            summary,
+            "This is a media report, so details should be checked against official public-health updates when available.",
+          ]
+        : [],
       whyItMatters:
-        "Recent reporting can surface developing events faster than official surveillance tables, but it should be interpreted alongside agency updates and source dates.",
+        "Media listings can surface developing events faster than official surveillance tables, but this feed entry does not include enough article text to summarize reliably.",
       guidance: [
         "Use official public-health agencies for confirmed case counts and public guidance.",
+        "Open the linked source listing or original publisher page before relying on the report details.",
         "For symptoms after possible rodent exposure, contact a clinician or local public health authority.",
       ],
     };

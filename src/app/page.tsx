@@ -56,23 +56,35 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-          <div className="rounded-[2rem] border border-slate-200 bg-white/80 p-6 shadow-xl shadow-teal-950/5 backdrop-blur">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold text-slate-500">{globalStatus.label}</p>
-                <h2 className="mt-2 text-3xl font-black text-slate-950">Current situation</h2>
-              </div>
-              <RiskBadge level={globalStatus.level} />
-            </div>
-            <p className="mt-5 text-base leading-7 text-slate-700">
-              {globalStatus.latestVerifiedUpdate}
-            </p>
-            <SourceLink
-              name={globalStatus.sourceName}
-              url={globalStatus.sourceUrl}
-              date={globalStatus.updatedAt}
+          <div className="group relative rounded-[2rem] border border-slate-200 bg-white/80 p-6 shadow-xl shadow-teal-950/5 backdrop-blur transition hover:border-teal-700">
+            <Link
+              href={globalStatus.detailsPath}
+              className="absolute inset-0 rounded-[2rem]"
+              aria-label="View current outbreak status details"
             />
-            <div className="mt-6 rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100">
+            <div className="relative pointer-events-none">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-slate-500">{globalStatus.label}</p>
+                  <h2 className="mt-2 text-3xl font-black text-slate-950">Current situation</h2>
+                </div>
+                <RiskBadge level={globalStatus.level} />
+              </div>
+              <p className="mt-5 text-base leading-7 text-slate-700">
+                {globalStatus.latestVerifiedUpdate}
+              </p>
+              <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-teal-900">
+                View outbreak details <ArrowRight size={16} />
+              </p>
+            </div>
+            <div className="relative z-10 mt-4">
+              <SourceLink
+                name={globalStatus.sourceName}
+                url={globalStatus.sourceUrl}
+                date={globalStatus.updatedAt}
+              />
+            </div>
+            <div className="relative pointer-events-none mt-6 rounded-2xl bg-slate-950 p-4 text-sm leading-6 text-slate-100">
               {sourceDisclaimer}
             </div>
           </div>
@@ -146,19 +158,28 @@ export default async function Home() {
             </Link>
           </div>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {articles.slice(0, 3).map((article) => (
-              <Link
-                key={article.slug}
-                href={`/news/${article.slug}`}
-                className="rounded-3xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-teal-700"
-              >
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">
-                  {article.eyebrow}
-                </p>
-                <h3 className="mt-2 text-2xl font-black text-slate-950">{article.title}</h3>
-                <p className="mt-3 leading-7 text-slate-700">{article.summary}</p>
-              </Link>
-            ))}
+            {articles.slice(0, 3).map((article) => {
+              const opensSource = article.contentStatus === "listing";
+
+              return (
+                <Link
+                  key={article.slug}
+                  href={opensSource ? article.sourceUrl : `/news/${article.slug}`}
+                  className="rounded-3xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-teal-700"
+                  target={opensSource ? "_blank" : undefined}
+                  rel={opensSource ? "noopener noreferrer" : undefined}
+                >
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-800">
+                    {article.eyebrow}
+                  </p>
+                  <p className="mt-2 text-xs font-semibold text-slate-500">
+                    {article.publishedAt}
+                  </p>
+                  <h3 className="mt-2 text-2xl font-black text-slate-950">{article.title}</h3>
+                  <p className="mt-3 leading-7 text-slate-700">{article.summary}</p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

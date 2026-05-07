@@ -27,7 +27,8 @@ export default function Page() {
                   <th className="p-4">Year</th>
                   <th className="p-4">Infections</th>
                   <th className="p-4">Deaths</th>
-                  <th className="p-4">Countries</th>
+                  <th className="p-4">Geography</th>
+                  <th className="p-4">Source</th>
                 </tr>
               </thead>
               <tbody>
@@ -35,8 +36,13 @@ export default function Page() {
                   <tr key={point.year} className="border-t border-slate-100">
                     <td className="p-4 font-semibold">{point.year}</td>
                     <td className="p-4">{point.infections.toLocaleString()}</td>
-                    <td className="p-4">{point.deaths.toLocaleString()}</td>
-                    <td className="p-4">{point.countries}</td>
+                    <td className="p-4">{point.deaths === null ? "Not reported" : point.deaths.toLocaleString()}</td>
+                    <td className="p-4">{point.geography}</td>
+                    <td className="p-4">
+                      <a className="text-teal-800 underline-offset-4 hover:underline" href={point.sourceUrl}>
+                        {point.sourceName}
+                      </a>
+                    </td>
                   </tr>
                 ))}
               </tbody>

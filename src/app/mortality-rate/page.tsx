@@ -26,9 +26,9 @@ export default function Page() {
             >
               <strong>{point.year}</strong>
               <span>{point.infections.toLocaleString()} infections</span>
-              <span>{point.deaths.toLocaleString()} deaths</span>
+              <span>{point.deaths === null ? "Deaths not reported" : `${point.deaths.toLocaleString()} deaths`}</span>
               <span className="font-black text-teal-900">
-                {getMortalityRate(point.deaths, point.infections)}%
+                {point.deaths === null ? "Not calculated" : `${getMortalityRate(point.deaths, point.infections)}%`}
               </span>
             </div>
           ))}
