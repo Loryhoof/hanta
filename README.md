@@ -8,8 +8,7 @@ indicators, trend dashboards, official-first news aggregation, and localized SEO
 - Next.js App Router, React Compiler, TypeScript, Tailwind CSS
 - PostgreSQL with Drizzle ORM
 - MapLibre GL risk map and Apache ECharts trend dashboard
-- Vercel Cron ingestion endpoint and Resend-ready alert API
-- Vitest unit tests and Playwright E2E smoke tests
+- Resend-ready alert API
 
 ## Local development
 
@@ -23,7 +22,6 @@ npm run dev
 
 ```bash
 npm run lint
-npm run test
 npm run build
 ```
 
