@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { Footer, Header } from "@/components/page-shell";
+import { defaultOgImage } from "@/lib/seo";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -24,8 +25,40 @@ export const metadata: Metadata = {
     template: `%s | ${site.name}`,
   },
   description: site.description,
+  keywords: site.keywords,
   applicationName: site.name,
   category: "public health",
+  creator: site.name,
+  publisher: site.name,
+  alternates: {
+    canonical: site.url,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  openGraph: {
+    title: `${site.name} | Hantavirus Prevention and Outbreak Updates`,
+    description: site.description,
+    url: site.url,
+    siteName: site.name,
+    type: "website",
+    locale: "en_US",
+    images: [defaultOgImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} | Hantavirus Prevention and Outbreak Updates`,
+    description: site.description,
+    images: [defaultOgImage.url],
+  },
 };
 
 export default function RootLayout({

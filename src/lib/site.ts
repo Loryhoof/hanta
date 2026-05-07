@@ -3,8 +3,20 @@ export const site = {
   domain: "hantavirusprevention.org",
   url: "https://hantavirusprevention.org",
   description:
-    "Hantavirus prevention guidance, outbreak updates, case trends, and research summaries.",
+    "Hantavirus prevention guidance, outbreak updates, case trends, symptoms, transmission, and research summaries.",
   emailFrom: "Hantavirus Prevention <alerts@hantavirusprevention.org>",
+  keywords: [
+    "hantavirus",
+    "hantavirus prevention",
+    "hantavirus symptoms",
+    "hantavirus transmission",
+    "hantavirus outbreak",
+    "hantavirus map",
+    "hantavirus cases",
+    "hantavirus death rate",
+    "rodent exposure",
+    "public health alerts",
+  ],
 };
 
 export const primaryNav = [

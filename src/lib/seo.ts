@@ -6,22 +6,33 @@ export function canonicalUrl(path = "/") {
   return `${site.url}${normalized === "/" ? "" : normalized}`;
 }
 
+export const defaultOgImage = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: "Hantavirus Prevention outbreak updates, risk map, and prevention guidance",
+};
+
 export function pageMetadata({
   title,
   description,
   path,
   type = "website",
+  keywords = [],
 }: {
   title: string;
   description: string;
   path: string;
   type?: "website" | "article";
+  keywords?: string[];
 }): Metadata {
   const url = canonicalUrl(path);
+  const mergedKeywords = Array.from(new Set([...site.keywords, ...keywords]));
 
   return {
     title,
     description,
+    keywords: mergedKeywords,
     alternates: { canonical: url },
     openGraph: {
       title,
@@ -29,11 +40,13 @@ export function pageMetadata({
       url,
       siteName: site.name,
       type,
+      images: [defaultOgImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [defaultOgImage.url],
     },
   };
 }
